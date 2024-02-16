@@ -3,6 +3,8 @@ Using Server Side Events broadcast match events.
 
 Events are simulated using algorithm.
 
+![Printscreen](printscreen.png)
+
 ## Installation
 
 ```bash
