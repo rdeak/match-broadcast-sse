@@ -1,5 +1,6 @@
-# match-broadcast-sse
-Using Server Side Events broadcast match events.
+# Broadcast events from server
+
+This repository implements Server Side Events for broadcasting events from a football match.
 
 Events are simulated using algorithm.
 
