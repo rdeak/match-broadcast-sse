@@ -13,10 +13,6 @@ def stream_events():
     try:
         print("Client connected")
         yield from watch_for_events()
-
-        # EventSource will reconnect automatically if we close the stream
-        while True:
-            None
     except CancelledError:
         print("Client disconnected.")
 
