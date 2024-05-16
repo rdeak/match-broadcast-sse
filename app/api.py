@@ -17,7 +17,7 @@ def stream_events():
         print("Client disconnected.")
 
 
-@app.get("/events")
+@app.get("/match-events")
 async def get_events():
     return StreamingResponse(stream_events(), media_type="text/event-stream")
 
