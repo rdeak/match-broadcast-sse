@@ -44,7 +44,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ GITHUB_OWNER }}-${{ GITHUB_REPOSITORY }}:${{ github.sha }}"
+          tags: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.AWS_ECR_NAME }}:${{ github.sha }}"
 
       - name: Log out of Amazon ECR
         run: docker logout ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
