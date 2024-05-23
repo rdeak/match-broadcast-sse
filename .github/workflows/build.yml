@@ -46,11 +46,11 @@ jobs:
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
-      - uses: rdeak/semantic-release-action@v1.0.1
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - uses: rdeak/semantic-release-action@v1
+        id: create-release
+
       - name: Build and push Docker image
+        if: ${{ steps.create-release.outputs.new_release_created }}
         id: build-image
         uses: docker/build-push-action@v5
         with:
@@ -61,4 +61,5 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
 
       - name: Log out of Amazon ECR
+        if: ${{ steps.create-release.outputs.new_release_created }}
         run: docker logout ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
