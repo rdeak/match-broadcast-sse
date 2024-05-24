@@ -48,6 +48,8 @@ jobs:
 
       - uses: rdeak/semantic-release-action@v1
         id: create-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
         if: ${{ steps.create-release.outputs.new_release_created }}
