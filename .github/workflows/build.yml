@@ -25,14 +25,13 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ inputs.aws_account_id }}:role/${{ inputs.aws_role_name }}
-          aws-region: ${{ inputs.aws_region }}
+          role-to-assume: arn:aws:iam::${{ secrets.aws_account_id }}:role/${{ secrets.aws_role_name }}
+          aws-region: ${{ secrets.aws_region }}
 
       - name: Build and publish docker image
         uses: rdeak/publish-image-action@v1
         with:
           release_tag: ${{ env.RELEASE_TAG }}
           aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
-          aws_role_name: ${{ secrets.AWS_ROLE_NAME }}
           aws_region: ${{ secrets.AWS_REGION }}
           aws_ecr_name: ${{ secrets.AWS_ECR_NAME }}
