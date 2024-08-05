@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 permissions:
   id-token: write
@@ -20,48 +17,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Cache Docker layers
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache
-          key: "${{ runner.os }}-buildx-${{ github.sha }}"
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      - name: Configure AWS credentials
-        id: aws-credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{secrets.AWS_ROLE_NAME}}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Log in to Amazon ECR
-        id: ecr-login
-        run: |
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-
       - uses: rdeak/semantic-release-action@v1
         id: create-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
-        if: ${{ steps.create-release.outputs.new_release_created }}
-        id: build-image
-        uses: docker/build-push-action@v5
+      - name: Build and publish docker image
+        uses: rdeak/publish-image-action@v1
         with:
-          context: .
-          push: true
-          tags: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.AWS_ECR_NAME }}:${{ env.RELEASE_TAG }}"
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
-
-      - name: Log out of Amazon ECR
-        if: ${{ steps.create-release.outputs.new_release_created }}
-        run: docker logout ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+          release_tag: ${{ env.RELEASE_TAG }}
+          aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
+          aws_role_name: ${{ secrets.AWS_ROLE_NAME }}
+          aws_region: ${{ secrets.AWS_REGION }}
+          aws_ecr_name: ${{ secrets.AWS_ECR_NAME }}
