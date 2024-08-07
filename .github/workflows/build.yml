@@ -20,7 +20,7 @@ jobs:
       - name: SSH probe
         shell: bash
         run: |
-          ssh -V
+          exit 1
 
       - uses: rdeak/semantic-release-action@v1
         id: create-release
@@ -40,3 +40,9 @@ jobs:
           aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
           aws_region: ${{ secrets.AWS_REGION }}
           aws_ecr_name: ${{ secrets.AWS_ECR_NAME }}
+
+      - name: Cleanup
+        if: always()
+        shell: bash
+        run: |
+          echo "cleaning up..."
