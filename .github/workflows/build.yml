@@ -17,6 +17,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: SSH probe
+        shell: bash
+        run: |
+          ssh -V
+
       - uses: rdeak/semantic-release-action@v1
         id: create-release
         env:
