@@ -31,6 +31,7 @@ jobs:
 
       - name: Build and publish docker image
         uses: rdeak/publish-image-action@v1
+        if: ${{ env.NEW_RELEASE_CREATED == 'true' }}
         with:
           release_tag: ${{ env.RELEASE_TAG }}
           aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
@@ -38,6 +39,7 @@ jobs:
           aws_ecr_name: ${{ secrets.AWS_ECR_NAME }}
 
       - name: Publish app
+        if: ${{ env.NEW_RELEASE_CREATED == 'true' }}
         shell: bash
         run: |
           aws ec2 authorize-security-group-ingress \
