@@ -1,6 +1,7 @@
 name: 'Build'
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -20,7 +21,16 @@ jobs:
       - name: SSH probe
         shell: bash
         run: |
-          exit 1
+          aws ec2 authorize-security-group-ingress \
+          --group-id "$(aws ec2 describe-security-groups \
+          --filters Name=group-name,Values="${{ secrets.AWS_SG_NAME }}" \
+          --query "SecurityGroups[*].GroupId" \
+          --output text \
+          --no-cli-pager)" \
+          --protocol tcp \
+          --port 22 \
+          --cidr $(curl -s http://checkip.amazonaws.com)/32 \
+          --no-cli-pager
 
       - uses: rdeak/semantic-release-action@v1
         id: create-release
@@ -41,8 +51,16 @@ jobs:
           aws_region: ${{ secrets.AWS_REGION }}
           aws_ecr_name: ${{ secrets.AWS_ECR_NAME }}
 
-      - name: Cleanup
+      - name: Revoke ingress rule
         if: always()
-        shell: bash
         run: |
-          echo "cleaning up..."
+          aws ec2 revoke-security-group-ingress \
+          --group-id "$(aws ec2 describe-security-groups \
+          --filters Name=group-name,Values="${{ secrets.AWS_SG_NAME }}" \
+          --query "SecurityGroups[*].GroupId" \
+          --output text \
+          --no-cli-pager)" \
+          --protocol tcp \
+          --port 22 \
+          --cidr $(curl -s http://checkip.amazonaws.com)/32 \
+          --no-cli-pager
